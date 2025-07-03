@@ -8,7 +8,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
-CHANNEL_ANO = 1390298916431462435
+CHANNEL_ANO = 1376186168953016428
 
 @bot.event
 async def on_ready():
