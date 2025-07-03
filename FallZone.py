@@ -40,6 +40,10 @@ async def on_ready():
 async def anonyme(interaction: discord.Interaction, contenu: str):
     await interaction.response.defer(ephemeral=True)  # Prévenir Discord qu'on va répondre
 
+    if "@" in contenu:
+        await interaction.followup.send("⛔ Les mentions ne sont pas autorisées dans ce message.", ephemeral=True)
+        return
+
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
     if not channel:
