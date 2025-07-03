@@ -40,62 +40,56 @@ async def on_ready():
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
 @app_commands.describe(contenu="Le message à envoyer anonymement")
 async def anonyme(interaction: discord.Interaction, contenu: str):
+    await interaction.response.defer(ephemeral=True)
+
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
-
-    if not channel:
-        await interaction.response.send_message("Erreur : salon introuvable.", ephemeral=True)
-        return
-    if not log_channel:
-        await interaction.response.send_message("Erreur : salon de logs introuvable.", ephemeral=True)
+    if not channel or not log_channel:
+        await interaction.followup.send("Erreur : salon introuvable.", ephemeral=True)
         return
 
     if "@" in contenu:
-        await interaction.response.send_message("⛔ Les mentions ne sont pas autorisées.", ephemeral=True)
-        # Logs ici si tu veux
+        await interaction.followup.send("⛔ Les mentions ne sont pas autorisées dans ce message.", ephemeral=True)
+
+        log_message = (
+            f"🚫 **Tentative de message anonyme bloquée**\n"
+            f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
+            f"**Contenu tenté** : {contenu}\n"
+            f"**Salon ciblé** : #{channel.name}\n"
+            f"**Heure** : {discord.utils.format_dt(discord.utils.utcnow(), style='F')}"
+        )
+        await log_channel.send(log_message)
         return
 
-    await interaction.response.defer(ephemeral=True)
-
-    # Création de l'image post-it (exemple simplifié)
-    from PIL import Image, ImageDraw, ImageFont
-    import io
-    import textwrap
-
-    image_path = "Fond.png"
-    try:
-        img = Image.open(image_path).convert("RGBA")
-    except Exception:
-        await interaction.followup.send("Erreur : image de fond introuvable.", ephemeral=True)
-        return
-
+    # Générer l'image type "post-it"
+    img = Image.new("RGB", (600, 400), color=(180, 160, 100))  # couleur vieux papier
     draw = ImageDraw.Draw(img)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 40)
+        font = ImageFont.truetype("arial.ttf", 30)  # Remplace par une police RP si dispo
     except:
         font = ImageFont.load_default()
 
-    wrapped_text = textwrap.fill(contenu, width=40)
-    draw.text((40, 50), wrapped_text, fill=(40, 20, 0), font=font)
+    draw.text((30, 30), contenu, fill=(50, 30, 0), font=font)  # texte brun
 
     with io.BytesIO() as image_binary:
-        img.save(image_binary, "PNG")
+        img.save(image_binary, 'PNG')
         image_binary.seek(0)
-        file = discord.File(fp=image_binary, filename="post_it.png")
+
+        file = discord.File(fp=image_binary, filename="postit.png")
         await channel.send(file=file)
 
-    await interaction.followup.send("Ton post-it a été déposé 📜", ephemeral=True)
+    await interaction.followup.send("Ton message anonyme a été posté sous forme de post-it 📝", ephemeral=True)
 
-    # Log de l'envoi
     log_message = (
-        f"📜 **Message anonyme envoyé**\n"
+        f"📝 **Message anonyme envoyé**\n"
         f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
         f"**Contenu** : {contenu}\n"
         f"**Salon** : #{channel.name}\n"
         f"**Heure** : {discord.utils.format_dt(discord.utils.utcnow(), style='F')}"
     )
     await log_channel.send(log_message)
+
 
     
 
