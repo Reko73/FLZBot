@@ -15,6 +15,13 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 CHANNEL_ANO = 1376186168953016428
 
+
+async def set_bot_status():
+    await bot.change_presence(
+        status=discord.Status.dnd,
+        activity=discord.Activity(type=discord.ActivityType.watching, name="🧟 | 𝗙𝗮𝗹𝗹𝗭𝗼𝗻𝗲")
+    )
+    
 @bot.event
 async def on_ready():
     print(f"Connecté en tant que {bot.user} (ID: {bot.user.id})")
@@ -23,13 +30,6 @@ async def on_ready():
         print(f"Commandes slash synchronisées : {len(synced)}")
     except Exception as e:
         print(f"Erreur lors de la synchronisation des commandes : {e}")
-
-async def set_bot_status():
-    # Définir l'activité et le statut du bot
-    await bot.change_presence(
-        status=discord.Status.dnd,  # Définir en mode "ne pas déranger"
-        activity=discord.Activity(type=discord.ActivityType.watching, name="🧟 | 𝗙𝗮𝗹𝗹𝗭𝗼𝗻𝗲")
-    )
 
 
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
