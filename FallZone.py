@@ -13,7 +13,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
-CHANNEL_ANO = 1376186168953016428
+CHANNEL_ANO = 1390321557980708986
 
 
 async def set_bot_status():
