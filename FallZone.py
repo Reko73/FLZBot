@@ -40,7 +40,6 @@ async def on_ready():
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
 @app_commands.describe(contenu="Le message à envoyer anonymement")
 async def anonyme(interaction: discord.Interaction, contenu: str):
-    await interaction.response.defer(ephemeral=True)
 
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
@@ -52,6 +51,8 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
         await interaction.followup.send("Erreur : salon de logs introuvable.", ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True)
+    
     if "@" in contenu:
         await interaction.followup.send("⛔ Les mentions ne sont pas autorisées dans ce message.", ephemeral=True)
 
