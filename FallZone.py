@@ -13,6 +13,18 @@ import io
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
+BOOST_ANNOUNCE_CHANNELS = {
+    1271212491568975944: 1278890511532298321,
+}
+
+ADMIN_ROLES = {
+    1271212491568975944: [1271212491568975952, 1378462539033346200, 1378463590239047834, 1378463451474563123, 1271212491568975948],
+}
+
+LOG_CHANNELS = {
+    1271212491568975944: 1300630527178706965,  # Serveur FallZone
+}
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
@@ -25,7 +37,13 @@ async def set_bot_status():
         status=discord.Status.dnd,
         activity=discord.Activity(type=discord.ActivityType.watching, name="🧟 | 𝗙𝗮𝗹𝗹𝗭𝗼𝗻𝗲")
     )
-    
+
+def user_is_admin(interaction):
+    guild_id = interaction.guild.id
+    allowed_role_ids = ADMIN_ROLES.get(guild_id, [])
+    return any(role.id in allowed_role_ids for role in interaction.user.roles)
+
+
 @bot.event
 async def on_ready():
     await set_bot_status()
@@ -35,6 +53,55 @@ async def on_ready():
         print(f"Commandes slash synchronisées : {len(synced)}")
     except Exception as e:
         print(f"Erreur lors de la synchronisation des commandes : {e}")
+
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if '@everyone' in message.content or '@here' in message.content:
+        guild_id = message.guild.id
+        allowed_role_ids = ADMIN_ROLES.get(guild_id, [])
+
+        if not any(role.id in allowed_role_ids for role in message.author.roles):
+            try:
+                await message.delete()
+            except discord.NotFound:
+                pass
+            await message.channel.send(
+                "Ton message contenant 'everyone' ou 'here' a été supprimé car tu n'as pas les permissions.",
+                delete_after=30
+            )
+
+            log_channel_id = LOG_CHANNELS.get(guild_id)
+            log_channel = message.guild.get_channel(log_channel_id) if log_channel_id else None
+            if log_channel:
+                await log_channel.send(f"Message supprimé de {message.author.mention} contenant 'everyone' ou 'here' : {message.content}")
+
+    await bot.process_commands(message)
+
+@bot.event
+async def on_member_update(before, after):
+    if before.premium_since is None and after.premium_since is not None:
+        guild_id = after.guild.id
+        channel_id = BOOST_ANNOUNCE_CHANNELS.get(guild_id)
+
+        if channel_id:
+            channel = after.guild.get_channel(channel_id)
+            if channel:
+                embed = discord.Embed(
+                    title="🚀 Merci pour le boost !",
+                    description=f"{after.mention} vient de booster **{after.guild.name}** ! 💜",
+                    color=discord.Color.purple()
+                )
+                embed.set_thumbnail(url=after.display_avatar.url)
+                await channel.send(embed=embed)
+
+
+# ===============================
+# ======== COMMANDES RP =========
+# ===============================
 
 
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
@@ -85,6 +152,24 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     await log_channel.send(log_message)
 
 
+# ===============================
+# ====== COMMANDES MODO =========
+# ===============================
+
+@bot.tree.command(name="purge", description="Supprime un nombre spécifié de messages.")
+async def purge(interaction: discord.Interaction, number: int):
+    if not user_is_admin(interaction):
+        await interaction.response.send_message("Vous n'avez pas les permissions nécessaires pour utiliser cette commande.", ephemeral=True)
+        return
+
+    if number <= 0:
+        await interaction.response.send_message("Veuillez spécifier un nombre positif de messages à supprimer.", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+    deleted = await interaction.channel.purge(limit=number)
+    await interaction.followup.send(f"{len(deleted)} messages ont été supprimés.", ephemeral=True)
+                
     
 
 keep_alive()
