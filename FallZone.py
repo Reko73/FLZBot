@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import os
+from keep_alive import keep_alive
+from discord.ext import commands, tasks
+from discord import app_commands, Embed, Colour
+from dotenv import load_dotenv
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
