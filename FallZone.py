@@ -77,7 +77,15 @@ async def on_message(message):
             log_channel_id = LOG_CHANNELS.get(guild_id)
             log_channel = message.guild.get_channel(log_channel_id) if log_channel_id else None
             if log_channel:
-                await log_channel.send(f"Message supprimé de {message.author.mention} contenant 'everyone' ou 'here' : {message.content}")
+                embed = Embed(
+                    title="🔒 Message supprimé",
+                    description=f"**Auteur :** {message.author.mention}\n"
+                                f"**Contenu :**\n```{message.content}```",
+                    color=0xFF0000
+                )
+                embed.set_footer(text=f"Salon : #{message.channel.name} • ID : {message.channel.id}")
+                embed.timestamp = message.created_at
+                await log_channel.send(embed=embed)
 
     await bot.process_commands(message)
 
