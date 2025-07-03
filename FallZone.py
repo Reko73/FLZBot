@@ -37,4 +37,5 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     await channel.send(embed=embed)
     await interaction.response.send_message("Ton message anonyme a été envoyé.", ephemeral=True)
 
+keep_alive()
 bot.run(TOKEN)
