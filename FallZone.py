@@ -54,9 +54,6 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
 
     await interaction.response.defer(ephemeral=True)
 
-    from PIL import Image, ImageDraw, ImageFont
-    import io
-
     def draw_text(draw, text, position, font, max_width, fill):
         lines = []
         words = text.split()
