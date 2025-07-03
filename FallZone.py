@@ -43,7 +43,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
         return
 
     embed = Embed(
-        title="📜 Un message anonyme a été trouvé...",
+        title="📜 Un Post-it a été déposé...",
         description=f"\"{contenu}\"",
         color=Colour.dark_grey()
     )
