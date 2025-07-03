@@ -24,6 +24,14 @@ async def on_ready():
     except Exception as e:
         print(f"Erreur lors de la synchronisation des commandes : {e}")
 
+async def set_bot_status():
+    # Définir l'activité et le statut du bot
+    await bot.change_presence(
+        status=discord.Status.dnd,  # Définir en mode "ne pas déranger"
+        activity=discord.Activity(type=discord.ActivityType.watching, name="🧟 | 𝗙𝗮𝗹𝗹𝗭𝗼𝗻𝗲")
+    )
+
+
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
 @app_commands.describe(contenu="Le message à envoyer anonymement")
 async def anonyme(interaction: discord.Interaction, contenu: str):
