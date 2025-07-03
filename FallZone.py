@@ -24,6 +24,7 @@ async def set_bot_status():
     
 @bot.event
 async def on_ready():
+    await set_bot_status()
     print(f"Connecté en tant que {bot.user} (ID: {bot.user.id})")
     try:
         synced = await bot.tree.sync()
