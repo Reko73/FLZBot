@@ -56,7 +56,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
 
         # Log de la tentative bloquée
         log_message = (
-            f"🚫 **Tentative de message anonyme bloquée**\n"
+            f"🚫 **Tentative de mention bloquée**\n"
             f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
             f"**Contenu tenté** : {contenu}\n"
             f"**Salon ciblé** : #{channel.name}\n"
