@@ -66,7 +66,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     draw = ImageDraw.Draw(img)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 30)  # Remplace par une police RP si dispo
+        font = ImageFont.truetype("arial.ttf", 60)  # Remplace par une police RP si dispo
     except:
         font = ImageFont.load_default()
 
