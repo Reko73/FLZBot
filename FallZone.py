@@ -14,8 +14,8 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
-CHANNEL_ANO = 1390321557980708986
-LOGS_DISCORD = 1376186169485951082
+CHANNEL_ANO = 1390325529906774096
+LOGS_DISCORD = 1390325343335878786
 
 
 async def set_bot_status():
