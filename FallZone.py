@@ -40,68 +40,70 @@ async def on_ready():
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
 @app_commands.describe(contenu="Le message à envoyer anonymement")
 async def anonyme(interaction: discord.Interaction, contenu: str):
-
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
 
-    if not channel:
-        await interaction.followup.send("Erreur : salon introuvable.", ephemeral=True)
+    if not channel or not log_channel:
+        await interaction.response.send_message("Erreur : salon introuvable.", ephemeral=True)
         return
-    if not log_channel:
-        await interaction.followup.send("Erreur : salon de logs introuvable.", ephemeral=True)
+
+    if "@" in contenu:
+        await interaction.response.send_message("⛔ Les mentions ne sont pas autorisées.", ephemeral=True)
+        # Log possible ici
         return
 
     await interaction.response.defer(ephemeral=True)
-    
-    if "@" in contenu:
-        await interaction.followup.send("⛔ Les mentions ne sont pas autorisées dans ce message.", ephemeral=True)
 
-        log_message = (
-            f"❌ **Tentative de message avec une mention**\n"
-            f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
-            f"**Contenu bloqué** : {contenu}\n"
-            f"**Salon visé** : #{channel.name}\n"
-            f"**Heure** : {discord.utils.format_dt(discord.utils.utcnow(), style='F')}"
-        )
-        await log_channel.send(log_message)
-        return
+    from PIL import Image, ImageDraw, ImageFont
+    import io
 
-    
-    image_path = "Fond.png" 
-    if not os.path.exists(image_path):
+    def draw_text(draw, text, position, font, max_width, fill):
+        lines = []
+        words = text.split()
+        while words:
+            line = ''
+            while words and draw.textsize(line + words[0], font=font)[0] <= max_width:
+                line += (words.pop(0) + ' ')
+            lines.append(line)
+        x, y = position
+        line_height = font.getsize('A')[1] + 4
+
+        for line in lines:
+            draw.text((x, y), line, font=font, fill=fill)
+            y += line_height
+
+    image_path = "Fond.png"
+    try:
+        img = Image.open(image_path).convert("RGBA")
+    except Exception:
         await interaction.followup.send("Erreur : image de fond introuvable.", ephemeral=True)
         return
 
-    from PIL import Image, ImageDraw, ImageFont
-    import io, textwrap
-
-    img = Image.open(image_path).convert("RGB")
     draw = ImageDraw.Draw(img)
-
     try:
         font = ImageFont.truetype("arial.ttf", 22)
     except:
         font = ImageFont.load_default()
 
-    wrapped_text = textwrap.fill(contenu, width=50)
-    draw.text((40, 50), wrapped_text, fill=(40, 20, 0), font=font)
+    draw_text(draw, contenu, (40, 50), font, max_width=700, fill=(40, 20, 0))
 
     with io.BytesIO() as image_binary:
         img.save(image_binary, "PNG")
         image_binary.seek(0)
-        file = discord.File(fp=image_binary, filename="anonyme.png")
+        file = discord.File(fp=image_binary, filename="post_it.png")
         await channel.send(file=file)
 
     await interaction.followup.send("Ton post-it a été déposé 📜", ephemeral=True)
 
     log_message = (
-        f"📝 **Message anonyme envoyé**\n"
+        f"📜 **Message anonyme envoyé**\n"
         f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
         f"**Contenu** : {contenu}\n"
         f"**Salon** : #{channel.name}\n"
         f"**Heure** : {discord.utils.format_dt(discord.utils.utcnow(), style='F')}"
     )
     await log_channel.send(log_message)
+
     
 
 keep_alive()
