@@ -40,10 +40,6 @@ async def on_ready():
 async def anonyme(interaction: discord.Interaction, contenu: str):
     await interaction.response.defer(ephemeral=True)  # Prévenir Discord qu'on va répondre
 
-    if "@" in contenu:
-        await interaction.followup.send("⛔ Les mentions ne sont pas autorisées dans ce message.", ephemeral=True)
-        return
-
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
     if not channel:
@@ -51,6 +47,20 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
         return
     if not log_channel:
         await interaction.followup.send("Erreur : salon de logs introuvable.", ephemeral=True)
+        return
+
+    if "@" in contenu:
+        await interaction.followup.send("⛔ Les mentions ne sont pas autorisées dans ce message.", ephemeral=True)
+
+        # Log de la tentative bloquée
+        log_message = (
+            f"🚫 **Tentative de message anonyme bloquée**\n"
+            f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
+            f"**Contenu tenté** : {contenu}\n"
+            f"**Salon ciblé** : #{channel.name}\n"
+            f"**Heure** : {discord.utils.format_dt(discord.utils.utcnow(), style='F')}"
+        )
+        await log_channel.send(log_message)
         return
 
     embed = Embed(
