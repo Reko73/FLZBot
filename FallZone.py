@@ -78,7 +78,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
 
     draw = ImageDraw.Draw(img)
     try:
-        font = ImageFont.truetype("arial.ttf", 22)
+        font = ImageFont.truetype("arial.ttf", 40)
     except:
         font = ImageFont.load_default()
 
