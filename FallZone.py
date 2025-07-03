@@ -54,28 +54,6 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
 
     await interaction.response.defer(ephemeral=True)
 
-   def draw_text(draw, text, position, font, max_width, fill):
-    lines = []
-    words = text.split()
-    while words:
-        line = ''
-        while words:
-            test_line = line + words[0] + ' '
-            bbox = draw.textbbox((0, 0), test_line, font=font)
-            line_width = bbox[2] - bbox[0]  
-            if line_width <= max_width:
-                line = test_line
-                words.pop(0)
-            else:
-                break
-        lines.append(line.strip()) 
-    x, y = position
-    line_height = font.getsize('A')[1] + 4 
-
-    for line in lines:
-        draw.text((x, y), line, font=font, fill=fill)
-        y += line_height
-
     image_path = "Fond.png"
     try:
         img = Image.open(image_path).convert("RGBA")
