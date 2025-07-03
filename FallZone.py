@@ -7,6 +7,7 @@ from discord.ext import commands, tasks
 from discord import app_commands, Embed, Colour
 from dotenv import load_dotenv
 
+load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.all()
