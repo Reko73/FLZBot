@@ -85,7 +85,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     except:
         font = ImageFont.load_default()
 
-    draw_text(draw, contenu, (40, 50), font, max_width=700, fill=(40, 20, 0))
+    draw_text(draw, contenu, (40, 50), font, max_width=1400, fill=(40, 20, 0))
 
     with io.BytesIO() as image_binary:
         img.save(image_binary, "PNG")
