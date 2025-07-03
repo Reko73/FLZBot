@@ -68,7 +68,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     embed = Embed(
         title="📜 Un Post-it a été déposé...",
         description=f"\"{contenu}\"",
-        color=Colour.dark_grey()
+        color=Colour.from_rgb(180, 160, 100)
     )
     embed.set_footer(text="Personne ne sait qui l’a écrit.")
 
