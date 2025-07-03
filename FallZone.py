@@ -43,16 +43,24 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
 
-    if not channel or not log_channel:
+    if not channel:
         await interaction.response.send_message("Erreur : salon introuvable.", ephemeral=True)
+        return
+    if not log_channel:
+        await interaction.response.send_message("Erreur : salon de logs introuvable.", ephemeral=True)
         return
 
     if "@" in contenu:
         await interaction.response.send_message("⛔ Les mentions ne sont pas autorisées.", ephemeral=True)
-        # Log possible ici
+        # Logs ici si tu veux
         return
 
     await interaction.response.defer(ephemeral=True)
+
+    # Création de l'image post-it (exemple simplifié)
+    from PIL import Image, ImageDraw, ImageFont
+    import io
+    import textwrap
 
     image_path = "Fond.png"
     try:
@@ -62,12 +70,14 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
         return
 
     draw = ImageDraw.Draw(img)
+
     try:
         font = ImageFont.truetype("arial.ttf", 40)
     except:
         font = ImageFont.load_default()
 
-    draw_text(draw, contenu, (40, 50), font, max_width=700, fill=(40, 20, 0))
+    wrapped_text = textwrap.fill(contenu, width=40)
+    draw.text((40, 50), wrapped_text, fill=(40, 20, 0), font=font)
 
     with io.BytesIO() as image_binary:
         img.save(image_binary, "PNG")
@@ -77,6 +87,7 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
 
     await interaction.followup.send("Ton post-it a été déposé 📜", ephemeral=True)
 
+    # Log de l'envoi
     log_message = (
         f"📜 **Message anonyme envoyé**\n"
         f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
