@@ -6,6 +6,7 @@ from keep_alive import keep_alive
 from discord.ext import commands, tasks
 from discord import app_commands, Embed, Colour
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -14,6 +15,7 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
 CHANNEL_ANO = 1390321557980708986
+LOGS_DISCORD = 1376186169485951082
 
 
 async def set_bot_status():
@@ -39,8 +41,12 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
     await interaction.response.defer(ephemeral=True)  # Prévenir Discord qu'on va répondre
 
     channel = bot.get_channel(CHANNEL_ANO)
+    log_channel = bot.get_channel(LOGS_DISCORD)
     if not channel:
         await interaction.followup.send("Erreur : salon introuvable.", ephemeral=True)
+        return
+    if not log_channel:
+        await interaction.followup.send("Erreur : salon de logs introuvable.", ephemeral=True)
         return
 
     embed = Embed(
@@ -52,6 +58,15 @@ async def anonyme(interaction: discord.Interaction, contenu: str):
 
     await channel.send(embed=embed)
     await interaction.followup.send("Ton message anonyme a été envoyé.", ephemeral=True)
+
+    log_message = (
+        f"📝 **Message anonyme envoyé**\n"
+        f"**Auteur** : {interaction.user} ({interaction.user.id})\n"
+        f"**Contenu** : {contenu}\n"
+        f"**Salon** : #{channel.name}\n"
+        f"**Heure** : {discord.utils.format_dt(discord.utils.utcnow(), style='F')}"
+    )
+    await log_channel.send(log_message)
 
 keep_alive()
 bot.run(TOKEN)
