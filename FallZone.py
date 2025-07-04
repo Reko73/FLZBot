@@ -116,7 +116,7 @@ async def on_member_update(before, after):
 @app_commands.describe(contenu="Le message à envoyer anonymement")
 async def anonyme(interaction: discord.Interaction, contenu: str):
     if not interaction.response.is_done():
-    try:
+        try:
         await interaction.response.defer(ephemeral=True)
     except discord.NotFound:
         return 
