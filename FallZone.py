@@ -115,7 +115,11 @@ async def on_member_update(before, after):
 @bot.tree.command(name="anonyme", description="Envoie un message RP anonyme dans un salon.")
 @app_commands.describe(contenu="Le message à envoyer anonymement")
 async def anonyme(interaction: discord.Interaction, contenu: str):
-    await interaction.response.defer(ephemeral=True)  # Prévenir Discord qu'on va répondre
+    if not interaction.response.is_done():
+    try:
+        await interaction.response.defer(ephemeral=True)
+    except discord.NotFound:
+        return 
 
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
