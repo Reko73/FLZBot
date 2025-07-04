@@ -106,14 +106,14 @@ async def on_message(message):
                 pass
 
             await message.channel.send(
-                "⛔ Lien Discord non autorisé ici. Ton message a été supprimé.",
-                delete_after=15
+                "⛔ Lien Discord non autorisé. Ton message a été supprimé.",
+                delete_after=10
             )
 
             if log_channel:
                 embed = discord.Embed(
                     title="🔗 Lien Discord supprimé",
-                    description="Un lien Discord a été posté par un membre non staff.",
+                    description="Un lien Discord a été posté par un survivant.",
                     color=discord.Color.orange()
                 )
                 embed.add_field(name="Auteur", value=message.author.mention, inline=True)
