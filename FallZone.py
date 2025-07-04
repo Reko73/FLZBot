@@ -25,6 +25,10 @@ LOG_CHANNELS = {
     1271212491568975944: 1300630527178706965,
 }
 
+DISCORD_LINK_CHANNELS = {
+    1271212491568975944: [1318165877350338612, 1313203999004164230],
+}
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
@@ -86,6 +90,38 @@ async def on_message(message):
                 embed.set_footer(text=f"Salon : #{message.channel.name} • ID : {message.channel.id}")
                 embed.timestamp = message.created_at
                 await log_channel.send(embed=embed)
+
+    guild_id = message.guild.id
+    allowed_role_ids = ADMIN_ROLES.get(guild_id, [])
+    log_channel_id = LOG_CHANNELS.get(guild_id)
+    log_channel = message.guild.get_channel(log_channel_id) if log_channel_id else None
+    channels_to_check = DISCORD_LINK_CHANNELS.get(guild_id, [])
+
+    if message.channel.id in channels_to_check and "discord.gg" in message.content.lower():
+    # ✅ Vérifie si l'utilisateur a au moins un rôle autorisé (staff)
+        if not any(role.id in allowed_role_ids for role in getattr(message.author, "roles", [])):
+            try:
+                await message.delete()
+            except discord.NotFound:
+                pass
+
+            await message.channel.send(
+                "⛔ Lien Discord non autorisé ici. Ton message a été supprimé.",
+                delete_after=15
+            )
+
+            if log_channel:
+                embed = discord.Embed(
+                    title="🔗 Lien Discord supprimé",
+                    description="Un lien Discord a été posté par un membre non staff.",
+                    color=discord.Color.orange()
+                )
+                embed.add_field(name="Auteur", value=message.author.mention, inline=True)
+                embed.add_field(name="Salon", value=message.channel.mention, inline=True)
+                embed.add_field(name="Contenu", value=f"```{message.content}```", inline=False)
+                embed.timestamp = message.created_at
+                await log_channel.send(embed=embed)
+    
 
     await bot.process_commands(message)
 
