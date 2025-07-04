@@ -117,9 +117,9 @@ async def on_member_update(before, after):
 async def anonyme(interaction: discord.Interaction, contenu: str):
     if not interaction.response.is_done():
         try:
-        await interaction.response.defer(ephemeral=True)
-    except discord.NotFound:
-        return 
+            await interaction.response.defer(ephemeral=True)
+        except discord.NotFound:
+            return
 
     channel = bot.get_channel(CHANNEL_ANO)
     log_channel = bot.get_channel(LOGS_DISCORD)
